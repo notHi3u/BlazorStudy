@@ -1,0 +1,50 @@
+﻿@page "/bookmain"
+@using BlazorApp4v6.Client.Services;
+@using BlazorApp4v6.Shared.Models;
+@inject IBookService bookService
+@inject NavigationManager NavigationManager
+
+<table class="col-12">
+    <thead>
+    <th class="col-1">Id</th>
+    <th class="col-2">Name</th>
+    <th class="col-1">Author</th>
+    <th class="col-2"></th>
+    </thead>
+    <tbody>
+        @foreach (var book in books)
+        {
+            <tr>
+                <td>@book.Id</td>
+                <td>@book.Name</td>
+                <td>@book.Author</td>
+                <td>
+                    <button class="btn btn-primary" @onclick="(() => ShowBook(book.Id))">Edit</button>
+                    <button class="btn btn-primary" @onclick="(() => DeleteBook(book.Id))">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<button class="btn btn-primary" @onclick="(() => CreateBook())">Add</button>
+
+@code {
+    List<BookUI> books = new List<BookUI>();
+    protected override async Task OnInitializedAsync()
+    {
+        books = await bookService.GetAllBooks();
+    }
+    void ShowBook(int id)
+    {
+        NavigationManager.NavigateTo($"book/{id}");
+    }
+    void CreateBook()
+    {
+        NavigationManager.NavigateTo("/book");
+    }
+    async Task DeleteBook(int id)
+    {
+        await bookService.DeleteBook(id);
+        NavigationManager.NavigateTo("/bookmain", true);
+    }
+}
